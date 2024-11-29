@@ -5,6 +5,17 @@
 
 source $(dirname "${BASH_SOURCE[0]}")/config.$1.sh
 read -r CERT_CONTENT_BASE64 KEY_CONTENT_BASE64
-echo "$CERT_CONTENT_BASE64" | base64 -d > "$CERT_FILE"
-echo "$KEY_CONTENT_BASE64" | base64 -d > "$KEY_FILE"
-$RELOAD_CMD
+CERT_CONTENT="$(echo "$CERT_CONTENT_BASE64" | base64 -d)"
+KEY_CONTENT="$(echo "$KEY_CONTENT_BASE64" | base64 -d)"
+if [[ "$CERT_FILE" != "" ]]; then
+    echo "$CERT_CONTENT" > "$CERT_FILE"
+fi
+if [[ "$KEY_FILE" != "" ]]; then
+    echo "$KEY_CONTENT" > "$KEY_FILE"
+fi
+if [[ "$RELOAD_CMD" != "" ]]; then
+    $RELOAD_CMD
+fi
+if declare -F on_reload > /dev/null; then
+    on_reload
+fi
